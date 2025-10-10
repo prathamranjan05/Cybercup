@@ -8,11 +8,15 @@ import logging
 from datetime import datetime
 import requests  # For Fast2SMS
 
+# ----- BASE DIR -----
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+WEB_DIR = os.path.join(BASE_DIR, "../CyberCupWebpadge")
+
 # ----- FLASK APP INIT -----
 app = Flask(
     __name__,
-    template_folder="../CyberCupWebpadge",
-    static_folder="../CyberCupWebpadge"
+    template_folder=WEB_DIR,
+    static_folder=WEB_DIR
 )
 CORS(app)
 
@@ -22,19 +26,19 @@ logging.basicConfig(level=logging.INFO)
 # ----- STATIC FILE ROUTES -----
 @app.route('/images/<path:filename>')
 def images(filename):
-    return send_from_directory("../CyberCupWebpadge/images", filename)
+    return send_from_directory(os.path.join(WEB_DIR, "images"), filename)
 
 @app.route('/map/<path:filename>')
 def map_files(filename):
-    return send_from_directory("../CyberCupWebpadge/map", filename)
+    return send_from_directory(os.path.join(WEB_DIR, "Map"), filename)
 
 @app.route('/js/<path:filename>')
 def js_files(filename):
-    return send_from_directory("../CyberCupWebpadge/js", filename)
+    return send_from_directory(os.path.join(WEB_DIR, "js"), filename)
 
 # ----- MODEL & DATA -----
-model_path = r"D:\Cybercup\backend\models\lgb_model.pkl"
-sensor_csv = r"D:\Cybercup\backend\db\flash_flood.csv"
+model_path = os.path.join(BASE_DIR, "models", "lgb_model.pkl")
+sensor_csv = os.path.join(BASE_DIR, "db", "flash_flood.csv")
 
 # Load trained model
 with open(model_path, "rb") as f:
@@ -60,8 +64,8 @@ unit_locations = {
 }
 
 # Fast2SMS configuration
-FAST2SMS_API_KEY = "z2CBWVbPPkCQp0H9V75WneHuW9cCAkw0bloCms025OTc7cMNoODleJY2BmUs"
-ALERT_PHONE = "919868881285"
+FAST2SMS_API_KEY = os.environ.get("FAST2SMS_API_KEY", "")
+ALERT_PHONE = os.environ.get("ALERT_PHONE", "")
 
 last_alert_status = {}
 
@@ -90,7 +94,6 @@ def send_fast2sms_alert(message, phone):
 # ----- CONTROL STRATEGIES MODULE -----
 def control_strategies(water_level, rainfall, location):
     suggestions = []
-
     if water_level > 1.8:
         suggestions.append(f"Activate pumps at {location}.")
         suggestions.append(f"Open diversion channels near {location}.")
@@ -103,7 +106,6 @@ def control_strategies(water_level, rainfall, location):
         suggestions.append(f"Monitor water levels at {location}.")
     else:
         suggestions.append(f"No immediate action required at {location}.")
-
     return suggestions
 
 # ----- ROUTES -----
@@ -117,11 +119,11 @@ def dashboard():
 
 @app.route("/manifest.json")
 def manifest():
-    return send_from_directory("../CyberCupWebpadge", "manifest.json")
+    return send_from_directory(WEB_DIR, "manifest.json")
 
 @app.route("/sw.js")
 def service_worker():
-    return send_from_directory("../CyberCupWebpadge", "sw.js")
+    return send_from_directory(WEB_DIR, "sw.js")
 
 @app.route("/api/waterlogged")
 def waterlogged():
@@ -153,7 +155,6 @@ def waterlogged():
                 logging.error(f"Error processing UNIT_ID {row.get('UNIT_ID', 'unknown')}: {e}")
                 continue
 
-        # Demo sensors
         demo_units = ["DELHI_01", "BLR_01", "KOL_01", "CHN_01"]
         for unit in demo_units:
             lat, lon = unit_locations[unit]
@@ -232,4 +233,3 @@ def send_alert(unit_id):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(debug=True, host="0.0.0.0", port=port)
-
