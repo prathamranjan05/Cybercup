@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Urban Flood Dashboard | Project Showcase</title>
+    <title>FloodWatch | Urban Flood Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic" crossorigin />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
     <style>
         :root {
@@ -41,7 +41,25 @@
         .main-nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; }
         .nav-left { display: flex; align-items: center; gap: 25px; }
         .nav-right { display: flex; align-items: center; gap: 20px; }
-        .logo { font-size: 1.5rem; font-weight: 700; color: var(--primary-color); text-decoration: none; }
+        
+        /* LOGO STYLES (New/Modified) */
+        .logo { 
+            font-size: 1.5rem; 
+            font-weight: 700; 
+            color: var(--primary-color); 
+            text-decoration: none;
+            /* Flex ensures alignment if you use text next to an icon */
+            display: flex; 
+            align-items: center; 
+        }
+        .logo-img {
+            /* Adjust height to fit the nav bar nicely */
+            height: 35px; 
+            width: auto;
+            display: block;
+        }
+        /* END LOGO STYLES */
+
         .nav-links { list-style: none; display: flex; gap: 25px; margin: 0; padding: 0; }
         .nav-links a { text-decoration: none; color: var(--text-dark); font-weight: 600; position: relative; padding-bottom: 5px; }
         .nav-links a::after { content: ""; position: absolute; bottom: 0; left: 0; width: 0; height: 2px; background-color: var(--primary-color); transition: width 0.3s ease; }
@@ -122,7 +140,9 @@
     <header class="main-header">
         <nav class="container main-nav">
             <div class="nav-left">
-                <a href="#" class="logo">FloodWatch</a>
+                <a href="#" class="logo">
+                    <img src="images/floodwatch-logo.jpg" alt="FloodWatch Logo" class="logo-img" />
+                </a>
                 <ul class="nav-links">
                     <li><a href="#features">Features</a></li>
                     <li><a href="#about">About</a></li>
@@ -178,7 +198,7 @@
                     <div class="about-content hidden-anim">
                         <h3>From Data to Decision</h3>
                         <p>Urban flooding is a critical challenge facing metropolitan areas worldwide. In a city as dynamic as Delhi, seasonal monsoons can quickly overwhelm infrastructure, leading to widespread disruption and posing significant risks to public safety.</p>
-                        <p>Our project, <strong>FloodWatch</strong>, was born from a desire to apply technology for civic good. We aim to bridge the gap between raw data and effective disaster response by providing city authorities with a centralized, intuitive, and real-time command center.</p>
+                        <p>Our project, **FloodWatch**, was born from a desire to apply technology for civic good. We aim to bridge the gap between raw data and effective disaster response by providing city authorities with a centralized, intuitive, and real-time command center.</p>
                         <p>By transforming complex sensor data into a clear visual interface with actionable intelligence, we empower decision-makers to act faster, allocate resources more efficiently, and ultimately protect lives and property.</p>
                     </div>
                 </div>
