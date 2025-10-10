@@ -1,0 +1,25 @@
+/* Ensure Control Strategies panel sits below other sidebar content */
+#control-strategies-panel {
+    margin-top: 20px;       /* space above */
+    padding: 12px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+#control-strategies-panel h3 {
+    margin-top: 0;
+    font-size: 1.1rem;
+    color: #34495e;
+    margin-bottom: 10px;
+}
+
+#control-strategies-panel ul {
+    padding-left: 15px;
+    margin: 0;
+}
+
+#control-strategies-panel ul li {
+    margin-bottom: 6px;
+    font-size: 0.95rem;
+}

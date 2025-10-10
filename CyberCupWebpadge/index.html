@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Urban Flood Dashboard | Project Showcase</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --primary-color: #005a9c;
+            --secondary-color: #34495e;
+            --background-light: #ffffff;
+            --background-grey: #f7f9fc;
+            --text-dark: #2c3e50;
+            --text-light: #ffffff;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            --border-color: #eee;
+        }
+        body.dark-theme {
+            --primary-color: #3498db;
+            --secondary-color: #95a5a6;
+            --background-light: #1e272e;
+            --background-grey: #2c3a47;
+            --text-dark: #ecf0f1;
+            --text-light: #1e272e;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            --border-color: #4a6375;
+        }
+        *, *::before, *::after { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { margin: 0; font-family: "Poppins", sans-serif; background-color: var(--background-light); color: var(--text-dark); transition: background-color 0.3s ease, color 0.3s ease; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+        .section { padding: 80px 0; }
+        .section-title { text-align: center; font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; color: var(--primary-color); }
+        .section-subtitle { text-align: center; font-size: 1.1rem; color: #667; margin-bottom: 4rem; max-width: 600px; margin-left: auto; margin-right: auto; }
+        .dark-theme .section-subtitle { color: #bdc3c7; }
+        .main-header { position: sticky; top: 0; width: 100%; z-index: 1000; background-color: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color); transition: background-color 0.3s ease, border-color 0.3s ease; }
+        .dark-theme .main-header { background-color: rgba(30, 39, 46, 0.85); }
+        .main-nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; }
+        .nav-left { display: flex; align-items: center; gap: 25px; }
+        .nav-right { display: flex; align-items: center; gap: 20px; }
+        .logo { font-size: 1.5rem; font-weight: 700; color: var(--primary-color); text-decoration: none; }
+        .nav-links { list-style: none; display: flex; gap: 25px; margin: 0; padding: 0; }
+        .nav-links a { text-decoration: none; color: var(--text-dark); font-weight: 600; position: relative; padding-bottom: 5px; }
+        .nav-links a::after { content: ""; position: absolute; bottom: 0; left: 0; width: 0; height: 2px; background-color: var(--primary-color); transition: width 0.3s ease; }
+        .nav-links a:hover::after { width: 100%; }
+        .auth-buttons { display: flex; gap: 10px; }
+        .auth-buttons button, .user-info button { background-color: var(--primary-color); color: var(--text-light); padding: 8px 20px; border-radius: 50px; border: none; font-weight: 600; cursor: pointer; font-family: "Poppins", sans-serif; transition: background-color 0.3s ease, transform 0.3s ease; }
+        .auth-buttons button:hover, .user-info button:hover { transform: scale(1.05); }
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .user-info span { font-weight: 600; }
+        .theme-toggle { background: var(--background-grey); border: 1px solid var(--border-color); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background-color 0.3s ease; }
+        .theme-toggle svg { width: 20px; height: 20px; fill: var(--text-dark); }
+        .theme-toggle .sun-icon { display: none; }
+        .dark-theme .theme-toggle .moon-icon { display: none; }
+        .dark-theme .theme-toggle .sun-icon { display: block; }
+        .hero { background: linear-gradient( rgba(0, 51, 102, 0.75), rgba(0, 26, 51, 0.85) ), url("https://images.unsplash.com/photo-1619234887964-6a5435039d82?q=80&w=2070&auto=format&fit=crop") no-repeat center center/cover; color: #ffffff; padding: 120px 0; text-align: center; }
+        .hero-content h1 { font-size: 3.5rem; font-weight: 700; margin-bottom: 0.5em; text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3); }
+        .hero-content p { font-size: 1.25rem; margin-bottom: 2em; max-width: 700px; margin-left: auto; margin-right: auto; }
+        .cta-button { display: inline-block; background-color: var(--background-light); color: var(--primary-color); padding: 15px 35px; font-size: 1.1rem; font-weight: 600; text-decoration: none; border-radius: 50px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; }
+        .cta-button:hover { transform: translateY(-5px); }
+        .dark-theme .cta-button { background-color: var(--text-dark); }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
+        .feature-card { background: var(--background-light); padding: 30px; border-radius: 10px; box-shadow: var(--shadow); text-align: center; transition: transform 0.3s ease, background-color 0.3s ease; }
+        .feature-card:hover { transform: translateY(-8px); }
+        .feature-card .icon { font-size: 3rem; margin-bottom: 1rem; }
+        .feature-card h3 { margin: 0 0 0.5rem 0; font-size: 1.25rem; color: var(--secondary-color); }
+        .feature-card p { margin: 0; color: #556; }
+        .dark-theme .feature-card p { color: #bdc3c7; }
+        #about { background-color: var(--background-grey); }
+        .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: center; }
+        .about-image img { width: 100%; border-radius: 10px; box-shadow: var(--shadow); }
+        .about-content h3 { font-size: 1.8rem; margin-top: 0; margin-bottom: 1rem; color: var(--secondary-color); }
+        .about-content p { line-height: 1.7; margin-bottom: 1rem; }
+        .dark-theme .about-content p { color: #bdc3c7; }
+        .team-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .team-card { text-align: center; background: var(--background-light); padding: 20px; border-radius: 10px; box-shadow: var(--shadow); transition: transform 0.3s ease, background-color 0.3s ease; }
+        .team-card:hover { transform: translateY(-5px); }
+        .team-card img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary-color); margin-bottom: 1rem; }
+        .team-card h3 { margin: 0; font-size: 1.2rem; }
+        .team-card p { margin: 0.25rem 0 0 0; color: #777; }
+        .dark-theme .team-card p { color: #95a5a6; }
+        #faq { background-color: var(--background-grey); }
+        .faq-container { max-width: 800px; margin: 0 auto; }
+        .faq-item { background: var(--background-light); margin-bottom: 10px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); border: 1px solid var(--border-color); }
+        .faq-item summary { font-size: 1.1rem; font-weight: 600; padding: 20px; cursor: pointer; list-style: none; position: relative; }
+        .faq-item summary::-webkit-details-marker { display: none; }
+        .faq-item summary::after { content: "+"; position: absolute; right: 20px; font-size: 1.5rem; transition: transform 0.3s ease; }
+        .faq-item[open] summary::after { transform: rotate(45deg); }
+        .faq-item div { padding: 0 20px 20px 20px; line-height: 1.6; color: #556; }
+        .dark-theme .faq-item div { color: #bdc3c7; }
+        .main-footer { background-color: var(--secondary-color); color: #bdc3c7; padding: 30px 0; }
+        .footer-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+        .footer-left h3 { margin: 0; font-size: 1.5rem; color: var(--text-light); }
+        .footer-left p { margin: 5px 0 0 0; font-size: 0.9rem; }
+        .footer-right ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 25px; }
+        .footer-right a { color: #bdc3c7; text-decoration: none; font-weight: 600; transition: color 0.3s ease; }
+        .footer-right a:hover { color: var(--text-light); }
+        .dark-theme .footer-left h3, .dark-theme .footer-right a:hover { color: #ecf0f1; }
+        .dark-theme .footer-left p, .dark-theme .footer-right a { color: #bdc3c7; }
+        .hidden-anim { opacity: 0; filter: blur(5px); transform: translateY(20px); transition: all 1s; }
+        .visible-anim { opacity: 1; filter: blur(0); transform: translateY(0); }
+        .hidden { display: none; }
+        @media (max-width: 900px) { .team-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 768px) { .nav-links, .auth-buttons, .user-info { display: none; } .hero-content h1 { font-size: 2.5rem; } .section-title { font-size: 2rem; } .about-grid { grid-template-columns: 1fr; } .footer-content { flex-direction: column; text-align: center; } }
+        @media (max-width: 500px) { .team-grid { grid-template-columns: 1fr; } }
+    </style>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0d6efd">
+    <script>
+    if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+    .then(() => console.log('Service Worker Registered'))
+    .catch(err => console.log('Service Worker failed:', err));
+}
+</script>
+    <script> (function () { const savedTheme = localStorage.getItem("theme"); const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches; if (savedTheme === "dark" || (!savedTheme && prefersDark)) { document.body.classList.add("dark-theme"); } })(); </script>
+</head>
+<body>
+    <header class="main-header">
+        <nav class="container main-nav">
+            <div class="nav-left">
+                <a href="#" class="logo">FloodWatch</a>
+                <ul class="nav-links">
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#team">Team</a></li>
+                    <li><a href="#faq">FAQ</a></li>
+                </ul>
+            </div>
+            <div class="nav-right">
+                <div class="auth-buttons" id="logged_out_view">
+                    <button id="login" type="button">Login</button>
+                    <button id="register" type="button">Register</button>
+                </div>
+                <div class="user-info hidden" id="logged_in_view">
+                    <span id="user_info_span"></span>
+                    <button id="logout" type="button">Logout</button>
+                </div>
+                <button class="theme-toggle" id="theme-toggle" title="Toggle theme">
+                    <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M12 11.807A9.002 9.002 0 0 1 10.049 2a9.942 9.942 0 0 0-4.01 3.913A9.994 9.994 0 0 0 12 22a9.994 9.994 0 0 0 5.961-16.087A9.942 9.942 0 0 0 13.951 2a9.002 9.002 0 0 1-1.944 9.807z" /> </svg>
+                    <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> <path d="M12 0c-.965 0-1.75.785-1.75 1.75v.5c0 .965.785 1.75 1.75 1.75s1.75-.785 1.75-1.75v-.5C13.75.785 12.965 0 12 0zm0 18c-.965 0-1.75.785-1.75 1.75v.5c0 .965.785 1.75 1.75 1.75s1.75-.785 1.75-1.75v-.5c0-.965-.785-1.75-1.75-1.75zM5.964 4.542c-.688-.688-1.794-.688-2.482 0-.688.688-.688 1.794 0 2.482l.354.354c.688.688 1.794.688 2.482 0 .688-.688.688-1.794 0-2.482l-.354-.354zm12.072 12.072c-.688-.688-1.794-.688-2.482 0-.688.688-.688 1.794 0 2.482l.354.354c.688.688 1.794.688 2.482 0 .688-.688.688-1.794 0-2.482l-.354-.354zM4 12c.965 0 1.75-.785 1.75-1.75h-.5c-.965 0-1.75.785-1.75 1.75s.785 1.75 1.75 1.75h.5c0-.965-.785-1.75-1.75-1.75zm16 0c.965 0 1.75-.785 1.75-1.75h-.5c-.965 0-1.75.785-1.75 1.75s.785 1.75 1.75 1.75h.5c0-.965-.785-1.75-1.75-1.75zM18.036 4.542l-.354.354c-.688.688-.688 1.794 0 2.482s1.794.688 2.482 0l.354-.354c.688-.688.688-1.794 0-2.482s-1.794-.688-2.482 0zM5.964 16.614l-.354.354c-.688.688-.688 1.794 0 2.482s1.794.688 2.482 0l.354-.354c.688-.688.688-1.794 0-2.482s-1.794-.688-2.482 0zM12 6.5A5.5 5.5 0 1 0 12 17.5 5.5 5.5 0 1 0 12 6.5zm0 9A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 1 1 0 7z" /> </svg>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero" id="home">
+            <div class="container hero-content">
+                <h1>Urban Flood Dashboard</h1>
+                <p>A GIS-based Command Center for the Delhi Authority, providing real-time visualization of waterlogged areas and actionable alerts to protect our city.</p>
+                <a href="dashboard.html" class="cta-button">Launch Live Dashboard →</a>
+            </div>
+        </section>
+
+        <section class="section" id="features">
+            <div class="container">
+                <h2 class="section-title">Key Features</h2>
+                <p class="section-subtitle">Our dashboard provides critical tools for effective disaster management and rapid response.</p>
+                <div class="features-grid">
+                    <div class="feature-card hidden-anim"> <div class="icon">🗺️</div> <h3>Live GIS Mapping</h3> <p>Visualize waterlogged zones in real-time on an interactive map of Delhi.</p> </div>
+                    <div class="feature-card hidden-anim"> <div class="icon">🔔</div> <h3>Instant Alerts</h3> <p>Receive immediate notifications for areas with critical water levels.</p> </div>
+                    <div class="feature-card hidden-anim"> <div class="icon">⚙️</div> <h3>Actionable Directives</h3> <p>Get clear, AI-suggested actions for emergency response teams on the ground.</p> </div>
+                    <div class="feature-card hidden-anim"> <div class="icon">📊</div> <h3>Data Analytics</h3> <p>Analyze trends and alert levels with an integrated data visualization chart.</p> </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="about">
+            <div class="container">
+                <h2 class="section-title">About Our Mission</h2>
+                <p class="section-subtitle">Leveraging technology to build a safer, more resilient urban environment for the citizens of Delhi.</p>
+                <div class="about-grid">
+                    <div class="about-image hidden-anim"><img src="map/map.jpg" alt="Map of Delhi Flood Zones" /></div>
+                    <div class="about-content hidden-anim">
+                        <h3>From Data to Decision</h3>
+                        <p>Urban flooding is a critical challenge facing metropolitan areas worldwide. In a city as dynamic as Delhi, seasonal monsoons can quickly overwhelm infrastructure, leading to widespread disruption and posing significant risks to public safety.</p>
+                        <p>Our project, <strong>FloodWatch</strong>, was born from a desire to apply technology for civic good. We aim to bridge the gap between raw data and effective disaster response by providing city authorities with a centralized, intuitive, and real-time command center.</p>
+                        <p>By transforming complex sensor data into a clear visual interface with actionable intelligence, we empower decision-makers to act faster, allocate resources more efficiently, and ultimately protect lives and property.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="section" id="team">
+            <div class="container">
+                <h2 class="section-title">Meet the Team</h2>
+                <p class="section-subtitle">The dedicated developers behind the Urban Flood Dashboard project.</p>
+                <div class="team-grid">
+                    <div class="team-card hidden-anim"><img src="images/chirag.jpg" alt="Chirag Agarwal" /><h3>Chirag Agarwal</h3><p>Team Lead</p></div>
+                    <div class="team-card hidden-anim"><img src="images/suryansh.jpg" alt="Suryansh Manral" /><h3>Suryansh Manral</h3><p>Frontend</p></div>
+                    <div class="team-card hidden-anim"><img src="images/shreyansh.jpg" alt="Shreyansh Jaiswal" /><h3>Shreyansh Jaiswal</h3><p>Data Analyst</p></div>
+                    <div class="team-card hidden-anim"><img src="images/pratham.jpg" alt="Pratham Ranjan" /><h3>Pratham Ranjan</h3><p>Backend</p></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="faq">
+            <div class="container">
+                <h2 class="section-title">Frequently Asked Questions</h2>
+                <div class="faq-container">
+                    <details class="faq-item hidden-anim"> <summary>How is the water level data collected?</summary> <div> <p>Our system is designed to integrate with real-time data from IoT sensors deployed in critical flood-prone areas across the city. For this prototype, we are using a simulation to generate dynamic data every 10 seconds.</p> </div> </details>
+                    <details class="faq-item hidden-anim"> <summary>Is the dashboard accessible on mobile devices?</summary> <div> <p>Yes, the entire dashboard is fully responsive. It is designed to be accessible and functional on desktops, tablets, and mobile phones, ensuring that authorities can access critical information from anywhere.</p> </div> </details>
+                    <details class="faq-item hidden-anim"> <summary>What do the different alert levels (Danger, Warning, Safe) mean?</summary> <div> <p><b>Danger (Red):</b> Indicates severe waterlogging (>1.8m) requiring immediate emergency response. <b>Warning (Orange):</b> Indicates significant waterlogging (>0.9m) that disrupts traffic. <b>Safe (Blue):</b> Indicates minor or no waterlogging.</p> </div> </details>
+                    <details class="faq-item hidden-anim"> <summary>Who is the primary user of this dashboard?</summary> <div> <p>The primary users are civic authorities, including disaster management agencies, traffic police, and municipal corporations. The goal is to provide them with a unified operational picture for a coordinated and efficient response. A simplified, public-facing version could be a future development.</p> </div> </details>
+                    <details class="faq-item hidden-anim"> <summary>How are the 'Actionable Directives' generated?</summary> <div> <p>Currently, the directives are based on a predefined rules engine that links water levels and location types to standard operating procedures (SOPs). Future versions will incorporate a machine learning model to provide more dynamic and predictive recommendations.</p> </div> </details>
+                    <details class="faq-item hidden-anim"> <summary>What are the future plans for FloodWatch?</summary> <div> <p>Our roadmap includes integrating live traffic data from APIs like Google Maps, developing a public alert system via SMS and WhatsApp, and implementing a predictive model using historical rainfall and flood data to forecast potential waterlogging events before they occur.</p> </div> </details>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <div class="container footer-content">
+            <div class="footer-left">
+                <h3>FloodWatch</h3>
+                <p>Built by ZeroDay</p>
+            </div>
+            <div class="footer-right">
+                <ul>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms & Conditions</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/script.js"></script>
+    <script type="module">
+        import createKindeClient from "https://cdn.jsdelivr.net/npm/@kinde-oss/kinde-auth-pkce-js/+esm";
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            // Kinde Auth
+            const kinde = await createKindeClient({
+                client_id: "16c6cbfda49f41108620ec8a9c4cd464",
+                domain: "https://testingnew.kinde.com",
+                redirect_uri: window.location.origin,
+                logout_uri: window.location.origin,
+            });
+
+            const loggedOutView = document.getElementById("logged_out_view");
+            const loggedInView = document.getElementById("logged_in_view");
+            const loginBtn = document.getElementById("login");
+            const registerBtn = document.getElementById("register");
+            const logoutBtn = document.getElementById("logout");
+            const userInfoSpan = document.getElementById("user_info_span");
+
+            const isAuthenticated = await kinde.isAuthenticated();
+            if (isAuthenticated) {
+                loggedInView.classList.remove('hidden');
+                loggedOutView.classList.add('hidden');
+                const user = await kinde.getUserProfile();
+                userInfoSpan.textContent = user.given_name || user.email;
+            } else {
+                loggedOutView.classList.remove('hidden');
+                loggedInView.classList.add('hidden');
+            }
+
+            if (loginBtn) loginBtn.addEventListener("click", async () => await kinde.login());
+            if (registerBtn) registerBtn.addEventListener("click", async () => await kinde.register());
+            if (logoutBtn) logoutBtn.addEventListener("click", async () => await kinde.logout());
+        });
+    </script>
+</body>
+</html>
