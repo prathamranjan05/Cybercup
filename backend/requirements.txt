@@ -4,4 +4,4 @@ numpy
 pandas
 requests==2.31.0
 flask-cors>=6.0.0
-lightgbm==4.3.5
+lightgbm==4.6.0
