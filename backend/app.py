@@ -64,6 +64,7 @@ unit_locations = {
     "CHN_01": (13.0827, 80.2707),
     "CHN_02": (13.0674, 80.2376),
 }
+
 # ----- CONTROL STRATEGIES MODULE -----
 def control_strategies(water_level, rainfall, location):
     suggestions = []
@@ -84,11 +85,11 @@ def control_strategies(water_level, rainfall, location):
 # ----- ROUTES -----
 @app.route("/")
 def index():
-    return send_from_directory(WEB_DIR, "index.html")  # ✅ FIXED
+    return send_from_directory(WEB_DIR, "index.html")
 
 @app.route("/dashboard.html")
 def dashboard():
-    return send_from_directory(WEB_DIR, "dashboard.html")  # ✅ FIXED
+    return send_from_directory(WEB_DIR, "dashboard.html")
 
 @app.route("/manifest.json")
 def manifest():
@@ -110,7 +111,17 @@ def waterlogged():
                     "drainage_level_cm": row["drainage_level_cm"] / 100.0,
                     "flow_rate_lps": row["flow_rate_lps"]
                 }])
+
                 predicted_level = model.predict(features_df)[0]
+
+                # ✅ ONLY FIX: define status before using it
+                status = (
+                    "safe"
+                    if predicted_level <= 0.9
+                    else "warning"
+                    if predicted_level <= 1.8
+                    else "danger"
+                )
 
                 lat, lon = unit_locations.get(row["UNIT_ID"], (19.0760, 72.8777))
                 sensors.append({
@@ -156,14 +167,14 @@ def get_control_strategies(unit_id):
             "drainage_level_cm": row["drainage_level_cm"] / 100.0,
             "flow_rate_lps": row["flow_rate_lps"]
         }])
-        predicted_level = model.predict(features_df)[0]
 
+        predicted_level = model.predict(features_df)[0]
         strategies = control_strategies(predicted_level, row["rainfall_mm_hr"], unit_id)
+
         return jsonify({"unit_id": unit_id, "strategies": strategies})
     except Exception as e:
         logging.error(f"Error generating control strategies for {unit_id}: {e}")
         return jsonify({"error": str(e)}), 500
-       
 
 # ----- RUN APP -----
 if __name__ == "__main__":
