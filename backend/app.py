@@ -64,35 +64,6 @@ unit_locations = {
     "CHN_01": (13.0827, 80.2707),
     "CHN_02": (13.0674, 80.2376),
 }
-
-# Fast2SMS configuration
-FAST2SMS_API_KEY = os.environ.get("FAST2SMS_API_KEY", "")
-ALERT_PHONE = os.environ.get("ALERT_PHONE", "")
-
-last_alert_status = {}
-
-def send_fast2sms_alert(message, phone):
-    url = "https://www.fast2sms.com/dev/bulkV2"
-    headers = {
-        "authorization": FAST2SMS_API_KEY,
-        "Content-Type": "application/json"
-    }
-    payload = {
-        "route": "v3",
-        "sender_id": "FLOODS",
-        "message": message,
-        "language": "english",
-        "flash": 0,
-        "numbers": phone
-    }
-    try:
-        response = requests.post(url, json=payload, headers=headers, timeout=10)
-        logging.info(f"Fast2SMS response: {response.status_code} {response.text}")
-        return response.status_code, response.text
-    except Exception as e:
-        logging.error(f"Error sending SMS via Fast2SMS: {e}")
-        return None, str(e)
-
 # ----- CONTROL STRATEGIES MODULE -----
 def control_strategies(water_level, rainfall, location):
     suggestions = []
@@ -140,9 +111,6 @@ def waterlogged():
                     "flow_rate_lps": row["flow_rate_lps"]
                 }])
                 predicted_level = model.predict(features_df)[0]
-
-                status = "danger" if predicted_level > 1.8 else "warning" if predicted_level > 0.9 else "safe"
-                last_alert_status.setdefault(row["UNIT_ID"], status)
 
                 lat, lon = unit_locations.get(row["UNIT_ID"], (19.0760, 72.8777))
                 sensors.append({
@@ -195,41 +163,7 @@ def get_control_strategies(unit_id):
     except Exception as e:
         logging.error(f"Error generating control strategies for {unit_id}: {e}")
         return jsonify({"error": str(e)}), 500
-
-@app.route("/api/send_alert/<unit_id>", methods=["POST"])
-def send_alert(unit_id):
-    try:
-        matched = sensors_df[sensors_df["UNIT_ID"] == unit_id].sort_values("TIMESTAMP").tail(1)
-        if matched.empty:
-            message = f"⚠️ ALERT: High flood risk reported at {unit_id} (no historical row found). Please check the dashboard."
-            status_code, resp_text = send_fast2sms_alert(message, ALERT_PHONE)
-            return jsonify({"sent": False if status_code is None else True, "detail": resp_text}), 200
-
-        row = matched.iloc[0]
-        features_df = pd.DataFrame([{
-            "rainfall_mm_hr": row["rainfall_mm_hr"],
-            "drainage_level_cm": row["drainage_level_cm"] / 100.0,
-            "flow_rate_lps": row["flow_rate_lps"]
-        }])
-        predicted_level = model.predict(features_df)[0]
-
-        msg = (
-            f"⚠️ FLOOD ALERT: {unit_id}\n"
-            f"Water level (predicted): {predicted_level:.2f} m\n"
-            f"Rainfall: {row['rainfall_mm_hr']} mm/hr\n"
-            f"Flow rate: {row['flow_rate_lps']} lps\n"
-            f"Time: {row['TIMESTAMP']}"
-        )
-
-        status_code, resp_text = send_fast2sms_alert(msg, ALERT_PHONE)
-        if status_code is None:
-            return jsonify({"sent": False, "error": resp_text}), 500
-
-        logging.info(f"Alert sent for {unit_id} via Fast2SMS. resp: {status_code}")
-        return jsonify({"sent": True, "status_code": status_code, "response": resp_text}), 200
-    except Exception as e:
-        logging.error(f"Error in send_alert for {unit_id}: {e}")
-        return jsonify({"sent": False, "error": str(e)}), 500
+       
 
 # ----- RUN APP -----
 if __name__ == "__main__":
