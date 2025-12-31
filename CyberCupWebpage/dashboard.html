@@ -129,7 +129,7 @@
         }
 
         #map {
-            flex: 3;
+            flex: 1 1 100%;
             height: 82vh;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
@@ -137,15 +137,16 @@
         }
 
         .sidebar {
-            flex: 1;
+            flex: 1 1 100%;
             background-color: white;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            height: 82vh;
+            height: auto;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
+            margin-top: 20px;
         }
 
         .sidebar h2 {
@@ -310,7 +311,7 @@
         /* Responsive Design */
         @media (max-width: 768px) {
             .dashboard-container { flex-direction: column; }
-            #map, .sidebar { height: 50vh; }
+            #map, .sidebar { height: auto; }
             .header-title h1 { font-size: 1.2rem; }
         }
     </style>
@@ -373,6 +374,7 @@ if ('serviceWorker' in navigator) {
                     <p>Fetching real-time field data. Stand by.</p>
                 </div>
             </div>
+
         </div>
     </div>
     
@@ -454,185 +456,161 @@ if ('serviceWorker' in navigator) {
             });
 
             // --- Menu Logic ---
-            const menuButton = document.getElementById('menu-button');
-            const dropdownMenu = document.getElementById('dropdown-menu');
-            menuButton.addEventListener('click', (event) => {
-                event.stopPropagation();
-                dropdownMenu.classList.toggle('active');
-                menuButton.classList.toggle('active');
-            });
-            window.addEventListener('click', () => {
-                if (dropdownMenu.classList.contains('active')) {
-                    dropdownMenu.classList.remove('active');
-                    menuButton.classList.remove('active');
-                }
-            });
+const menuButton = document.getElementById('menu-button');
+const dropdownMenu = document.getElementById('dropdown-menu');
+menuButton.addEventListener('click', (event) => {
+    event.stopPropagation();
+    dropdownMenu.classList.toggle('active');
+    menuButton.classList.toggle('active');
+});
+window.addEventListener('click', () => {
+    if (dropdownMenu.classList.contains('active')) {
+        dropdownMenu.classList.remove('active');
+        menuButton.classList.remove('active');
+    }
+});
 
-            // --- Map and Dashboard Setup ---
-            const map = L.map('map', { zoomControl: false }).setView([28.6139, 77.2090], 5);
-            L.control.zoom({ position: 'bottomright' }).addTo(map);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
-            const waterLayer = L.layerGroup().addTo(map);
-            const pulseLayer = L.layerGroup().addTo(map);
+// --- Map and Dashboard Setup ---
+const map = L.map('map', { zoomControl: false }).setView([28.6139, 77.2090], 5);
+L.control.zoom({ position: 'bottomright' }).addTo(map);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+const waterLayer = L.layerGroup().addTo(map);
+const pulseLayer = L.layerGroup().addTo(map);
 
-            const legendContainer = document.getElementById('legend-container');
-            if (legendContainer) {
-                legendContainer.innerHTML = `
-                    <div class="legend-item"><div class="color-box" style="background: ${dangerColor};"></div>Danger</div>
-                    <div class="legend-item"><div class="color-box" style="background: ${warningColor};"></div>Warning</div>
-                    <div class="legend-item"><div class="color-box" style="background: ${safeColor};"></div>Safe</div>
-                `;
-            }
+const legendContainer = document.getElementById('legend-container');
+if (legendContainer) {
+    legendContainer.innerHTML = `
+        <div class="legend-item"><div class="color-box" style="background: ${dangerColor};"></div>Danger</div>
+        <div class="legend-item"><div class="color-box" style="background: ${warningColor};"></div>Warning</div>
+        <div class="legend-item"><div class="color-box" style="background: ${safeColor};"></div>Safe</div>
+    `;
+}
 
-            function initializeChart() {
-                const ctx = document.getElementById('alert-chart').getContext('2d');
-                alertChart = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Danger', 'Warning', 'Safe'],
-                        datasets: [{
-                            label: 'Alert Levels',
-                            data: [0, 0, 1],
-                            backgroundColor: [dangerColor, warningColor, safeColor],
-                            borderColor: '#ffffff',
-                            borderWidth: 2
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } }
-                    }
-                });
-            }
+function initializeChart() {
+    const ctx = document.getElementById('alert-chart').getContext('2d');
+    alertChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Danger', 'Warning', 'Safe'],
+            datasets: [{
+                label: 'Alert Levels',
+                data: [0, 0, 1],
+                backgroundColor: [dangerColor, warningColor, safeColor],
+                borderColor: '#ffffff',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } }
+        }
+    });
+}
 
-            // --- Fetch Real Data from Backend ---
-            async function fetchWaterloggedData() {
-                try {
-                    const response = await fetch('/api/waterlogged'); // Flask endpoint
-                    if (!response.ok) throw new Error('Network response was not ok');
-                    const data = await response.json();
-                    return data; // Array of {lat, lon, water_level}
-                } catch (error) {
-                    console.error('Error fetching waterlogged data:', error);
-                    return [];
-                }
-            }
+// --- Fetch Real Data from Backend ---
+async function fetchWaterloggedData() {
+    try {
+        const response = await fetch('/api/waterlogged'); // Flask endpoint
+        if (!response.ok) throw new Error('Network response was not ok');
+        const data = await response.json();
+        return data; // Array of {lat, lon, water_level}
+    } catch (error) {
+        console.error('Error fetching waterlogged data:', error);
+        return [];
+    }
+}
 
-            // Helper to set chart background to majority color
-            function setChartContainerMajorityColor(counts) {
-                const chartContainer = document.getElementById('chart-and-info');
-                const [dangerCount, warningCount, safeCount] = counts;
-                const maxCount = Math.max(dangerCount, warningCount, safeCount);
-                let bg = '#fff';
-                if (maxCount === dangerCount) bg = '#feecec'; // subtle red
-                else if (maxCount === warningCount) bg = '#fff7ea'; // subtle orange
-                else bg = '#f0fff4'; // subtle green
-                chartContainer.style.backgroundColor = bg;
-            }
+// Helper to set chart background to majority color
+function setChartContainerMajorityColor(counts) {
+    const chartContainer = document.getElementById('chart-and-info');
+    const [dangerCount, warningCount, safeCount] = counts;
+    const maxCount = Math.max(dangerCount, warningCount, safeCount);
+    let bg = '#fff';
+    if (maxCount === dangerCount) bg = '#feecec'; // subtle red
+    else if (maxCount === warningCount) bg = '#fff7ea'; // subtle orange
+    else bg = '#f0fff4'; // subtle green
+    chartContainer.style.backgroundColor = bg;
+}
 
-            async function updateDashboard() {
-                const data = await fetchWaterloggedData();
-                waterLayer.clearLayers();
-                pulseLayer.clearLayers();
-                const alertContainer = document.getElementById('alert-container');
-                alertContainer.innerHTML = '';
+async function updateDashboard() {
+    const data = await fetchWaterloggedData();
+    waterLayer.clearLayers();
+    pulseLayer.clearLayers();
+    const alertContainer = document.getElementById('alert-container');
+    alertContainer.innerHTML = '';
 
-                let dangerCount = 0, warningCount = 0, safeCount = 0;
+    let dangerCount = 0, warningCount = 0, safeCount = 0;
 
-                // Create markers and attach click handlers
-                data.forEach(point => {
-                    const level = point.water_level > 1.8 ? 'danger' : (point.water_level > 0.9 ? 'warning' : 'safe');
-                    if (level === 'danger') dangerCount++;
-                    else if (level === 'warning') warningCount++;
-                    else safeCount++;
+    // Create markers and attach click handlers
+    data.forEach(point => {
+        const level = point.water_level > 1.8 ? 'danger' : (point.water_level > 0.9 ? 'warning' : 'safe');
+        if (level === 'danger') dangerCount++;
+        else if (level === 'warning') warningCount++;
+        else safeCount++;
 
-                    const color = level === 'danger' ? dangerColor : (level === 'warning' ? warningColor : safeColor);
+        const color = level === 'danger' ? dangerColor : (level === 'warning' ? warningColor : safeColor);
 
-                    const circle = L.circleMarker([point.lat, point.lon], {
-                        radius: 6 + point.water_level * 4,
-                        color: 'white',
-                        weight: 1,
-                        fillColor: color,
-                        fillOpacity: 0.9
-                    }).addTo(waterLayer);
+        const circle = L.circleMarker([point.lat, point.lon], {
+            radius: 6 + point.water_level * 4,
+            color: 'white',
+            weight: 1,
+            fillColor: color,
+            fillOpacity: 0.9
+        }).addTo(waterLayer);
 
-                    // Danger pulse for blinking
-                    if (level === 'danger') {
-                        const pulseIcon = L.divIcon({ className: 'leaflet-marker-pulse', html: '<div class="pulse"></div>' });
-                        L.marker([point.lat, point.lon], { icon: pulseIcon }).addTo(pulseLayer);
-                    }
+        // Danger pulse for blinking
+        if (level === 'danger') {
+            const pulseIcon = L.divIcon({ className: 'leaflet-marker-pulse', html: '<div class="pulse"></div>' });
+            L.marker([point.lat, point.lon], { icon: pulseIcon }).addTo(pulseLayer);
+        }
 
-                    // marker click: update donut/info and optionally trigger sms if danger
-                    circle.on('click', async () => {
-                        // Update info box
-                        document.getElementById('info-id').textContent = `ID: ${point.id}`;
-                        document.getElementById('info-status').textContent = `Status: ${level.toUpperCase()}`;
-                        document.getElementById('info-level').textContent = `Water Level: ${point.water_level.toFixed(2)} m`;
-                        document.getElementById('info-time').textContent = `Timestamp: ${point.timestamp || 'N/A'}`;
+        // marker click: update donut/info
+        circle.on('click', () => {
+            document.getElementById('info-id').textContent = `ID: ${point.id}`;
+            document.getElementById('info-status').textContent = `Status: ${level.toUpperCase()}`;
+            document.getElementById('info-level').textContent = `Water Level: ${point.water_level.toFixed(2)} m`;
+            document.getElementById('info-time').textContent = `Timestamp: ${point.timestamp || 'N/A'}`;
+        });
 
-                        // If the marker is danger, call backend to send SMS alert
-                        if (level === 'danger') {
-                            try {
-                                const res = await fetch(`/api/send_alert/${encodeURIComponent(point.id)}`, {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' }
-                                });
-                                const json = await res.json();
-                                // Show small success/failure in alert container
-                                const statusMsg = json.sent ? 'Alert SMS sent.' : `Alert failed: ${json.error || json.detail || 'unknown'}`;
-                                const tinyAlert = document.createElement('div');
-                                tinyAlert.className = 'alert alert-danger';
-                                tinyAlert.innerHTML = `<h4>SMS</h4><p>${statusMsg}</p>`;
-                                alertContainer.prepend(tinyAlert);
-                            } catch (e) {
-                                console.error('Error calling send_alert:', e);
-                                const tinyAlert = document.createElement('div');
-                                tinyAlert.className = 'alert alert-danger';
-                                tinyAlert.innerHTML = `<h4>SMS</h4><p>Error triggering SMS: ${e}</p>`;
-                                alertContainer.prepend(tinyAlert);
-                            }
-                        }
-                    });
+        // Also add alert cards for danger/warning in the side list
+        if (level === 'danger' || level === 'warning') {
+            const suggestedAction = level === 'danger'
+                ? 'IMMEDIATE ACTION: Deploy emergency teams. Assess evacuation needs.'
+                : 'PREEMPTIVE ACTION: Dispatch mobile pumps. Issue traffic advisory.';
 
-                    // Also add alert cards for danger/warning in the side list
-                    if (level === 'danger' || level === 'warning') {
-                        const suggestedAction = level === 'danger'
-                            ? 'IMMEDIATE ACTION: Deploy emergency teams. Assess evacuation needs.'
-                            : 'PREEMPTIVE ACTION: Dispatch mobile pumps. Issue traffic advisory.';
+            const alertElement = document.createElement('div');
+            alertElement.className = `alert alert-${level}`;
+            alertElement.dataset.lat = point.lat;
+            alertElement.dataset.lon = point.lon;
+            alertElement.innerHTML = `
+                <h4>${level.toUpperCase()} ALERT</h4>
+                <p>Location: ${point.id} (${point.lat.toFixed(4)}, ${point.lon.toFixed(4)})</p>
+                <p>Level: <strong>${point.water_level.toFixed(2)}m</strong></p>
+                <p><strong class="action">Action:</strong> ${suggestedAction}</p>
+            `;
+            alertElement.addEventListener('click', () => map.setView([point.lat, point.lon], 13));
+            alertContainer.appendChild(alertElement);
+        }
+    });
 
-                        const alertElement = document.createElement('div');
-                        alertElement.className = `alert alert-${level}`;
-                        alertElement.dataset.lat = point.lat;
-                        alertElement.dataset.lon = point.lon;
-                        alertElement.innerHTML = `
-                            <h4>${level.toUpperCase()} ALERT</h4>
-                            <p>Location: ${point.id} (${point.lat.toFixed(4)}, ${point.lon.toFixed(4)})</p>
-                            <p>Level: <strong>${point.water_level.toFixed(2)}m</strong></p>
-                            <p><strong class="action">Action:</strong> ${suggestedAction}</p>
-                        `;
-                        alertElement.addEventListener('click', () => map.setView([point.lat, point.lon], 13));
-                        alertContainer.appendChild(alertElement);
-                    }
-                });
+    // Update donut chart (global counts)
+    if (alertChart) {
+        alertChart.data.datasets[0].data = [dangerCount, warningCount, safeCount];
+        alertChart.update();
+    }
+    setChartContainerMajorityColor([dangerCount, warningCount, safeCount]);
 
-                // Update donut chart (global counts)
-                if (alertChart) {
-                    alertChart.data.datasets[0].data = [dangerCount, warningCount, safeCount];
-                    alertChart.update();
-                }
-                setChartContainerMajorityColor([dangerCount, warningCount, safeCount]);
+    if (dangerCount === 0 && warningCount === 0) {
+        alertContainer.innerHTML = '<div class="alert alert-info"><h4>System Status: All Clear</h4><p>No critical waterlogging incidents reported.</p></div>';
+    }
+}
 
-                if (dangerCount === 0 && warningCount === 0) {
-                    alertContainer.innerHTML = '<div class="alert alert-info"><h4>System Status: All Clear</h4><p>No critical waterlogging incidents reported.</p></div>';
-                }
-            }
-
-            initializeChart();
-            updateDashboard();
-            setInterval(updateDashboard, 10000);
+initializeChart();
+updateDashboard();
+setInterval(updateDashboard, 10000);
         });
     </script>
 </body>

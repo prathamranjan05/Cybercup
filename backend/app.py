@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template, send_from_directory, request
+from flask import Flask, jsonify, send_from_directory, request
 import pandas as pd
 import numpy as np
 import pickle
@@ -11,13 +11,13 @@ import requests  # For Fast2SMS
 # ----- BASE DIR -----
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# ✅ UPDATED: frontend folder renamed to "web page"
-WEB_DIR = os.path.join(BASE_DIR, "../web page")
+# ✅ Frontend folder
+WEB_DIR = os.path.join(BASE_DIR, "D:\Cybercup\CyberCupWebpage")
 
 # ----- FLASK APP INIT -----
 app = Flask(
     __name__,
-    template_folder=WEB_DIR,
+    template_folder=WEB_DIR,  # still needed for Flask internals
     static_folder=WEB_DIR
 )
 CORS(app)
@@ -113,11 +113,11 @@ def control_strategies(water_level, rainfall, location):
 # ----- ROUTES -----
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return send_from_directory(WEB_DIR, "index.html")  # ✅ FIXED
 
 @app.route("/dashboard.html")
 def dashboard():
-    return render_template("dashboard.html")
+    return send_from_directory(WEB_DIR, "dashboard.html")  # ✅ FIXED
 
 @app.route("/manifest.json")
 def manifest():
