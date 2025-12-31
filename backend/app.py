@@ -12,7 +12,7 @@ import requests  # For Fast2SMS
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # ✅ Frontend folder
-WEB_DIR = os.path.join(BASE_DIR, "D:\Cybercup\CyberCupWebpage")
+WEB_DIR = os.path.join(BASE_DIR, "../CyberCupWebpage")
 
 # ----- FLASK APP INIT -----
 app = Flask(
