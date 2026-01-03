@@ -124,16 +124,16 @@ Meet the Team
 
 The dedicated developers behind the FLOOD WATCH project.
 
-Chirag Agarwal
+**Chirag Agarwal**
 Team Lead
 
-Suryansh Manral
+**Suryansh Manral**
 Frontend Developer
 
-Shreyansh Jaiswal
+**Shreyansh Jaiswal**
 Data Analyst
 
-Pratham Ranjan
+**Pratham Ranjan**
 Backend Developer
 
 **Use Cases**
