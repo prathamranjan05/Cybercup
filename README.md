@@ -136,7 +136,7 @@ Data Analyst
 Pratham Ranjan
 Backend Developer
 
-Use Cases
+**Use Cases**
 
 Smart city flood monitoring
 
